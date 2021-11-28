@@ -1,11 +1,30 @@
 #!/bin/sh
-
 # Config parameters
+#PATH=/usr/bin:/bin
 
-conf="/usr/local/etc/ovpnauth.conf"
-logfile="/var/log/ovpnauth.log"
+conf="/etc/openvpn/ovpnauth.dat"
+logfile="/etc/openvpn/ovpnauth.log"
 
 # End of config parameters
+md5(){
+        echo "$1" > /tmp/$$.md5calc
+        sum="`md5sum /tmp/$$.md5calc | awk '{print $1}'`"
+        rm /tmp/$$.md5calc
+        echo "$sum"
+}
+
+log(){
+	echo ""
+	#echo "`date +'%m/%d/%y %H:%M'` - $1" >> $logfile
+}
+
+logenv(){
+	enviroment="`env | awk '{printf "%s ", $0}'`"
+	echo "`date +'%m/%d/%y %H:%M'` - $enviroment" >> $logfile
+}
+
+
+log "auth called"
 
 if [ "$1" = "" ] || [ "$1" = "help" ]
 then
@@ -17,45 +36,28 @@ then
 	exit 1
 fi
 
-md5(){
-        echo "$1.`uname -n`" > /tmp/$$.md5calc
-        sum="`md5sum /tmp/$$.md5calc | awk '{print $1}'`"
-        rm /tmp/$$.md5calc
-        echo "$sum"
-}
-
 if [ "$1" = "md5" ]
 then
         echo `md5 $2`
 	exit 1
 fi
 
-log(){
-	echo "`date +'%m/%d/%y %H:%M'` - $1" >> $logfile
-}
-
-logenv(){
-	enviroment="`env | awk '{printf "%s ", $0}'`"
-	echo "`date +'%m/%d/%y %H:%M'` - $enviroment" >> $logfile
-}
-
-envr="`echo `env``"
-userpass=`cat $1`
-username=`echo $userpass | awk '{print $1}'`
-password=`echo $userpass | awk '{print $2}'`
+username=`awk 'NR==1' "$1"`
+password=`awk 'NR==2' "$1"`
+storedpass=password
 
 # computing password md5
 password=`md5 $password`
-userpass=`cat $conf | grep $username= | awk -F= '{print $2}'`
+storedpass=`cat $conf | grep $username= | awk -F= '{print $2}'`
 
-if [ "$password" = "$userpass" ] 
+if [ "$password" = "$storedpass" ] 
 then
 	log "OpenVPN authentication successfull: $username"
-	logenv
+	#logenv
 	exit 0
 fi
 
-log "OpenVPN authentication failed"
-log `cat $1`
-logenv
+log "OpenVPN authentication failed: $username"
+#logenv
 exit 1
+
