@@ -11,8 +11,10 @@ NONE
 
 INSTALL
 ------------------------------------
+
 x) Follow wiki
 https://openwrt.org/docs/guide-user/services/vpn/openvpn/server
+
 Part 1) Don't do this two last sections
 	# Fetch WAN IP address
 	. /lib/functions/network.sh
@@ -58,3 +60,10 @@ make it executable (chmod +x) and make sure you can execute it
  	and don't forget to specify auth-user-pass option in 
 	your openvpn client config
  
+
+) Follow this to add the server config to web luci
+Adding Configuration
+https://openwrt.org/docs/guide-user/services/vpn/openvpn/extras#instance_management
+Adding Intefaces
+
+
