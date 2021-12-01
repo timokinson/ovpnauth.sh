@@ -7,7 +7,7 @@ logfile="/etc/openvpn/ovpnauth.log"
 
 # End of config parameters
 md5(){
-        echo "$1" > /tmp/$$.md5calc
+        echo "$1.`uname -n`" > /tmp/$$.md5calc
         sum="`md5sum /tmp/$$.md5calc | awk '{print $1}'`"
         rm /tmp/$$.md5calc
         echo "$sum"
